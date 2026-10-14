@@ -28,7 +28,7 @@ class PictureReader:
         if b'BM' in magic_number:
             header = PictureReader.__read_win_header(address)
         if not header:
-            raise TypeError(f'there is no such magic number {magic_number}')
+            raise TypeError(f'unexpected magic number {magic_number}')
         return header
 
     @staticmethod
@@ -77,9 +77,7 @@ class PictureReader:
         if isinstance(header, WinHeader):
             pixel_depth: int = header.get_depth()
             row_width: int = header.get_width()
-            bytes_per_pixel = pixel_depth // 8
-            row_size = row_width * bytes_per_pixel
-            padding = (4 - row_size % 4) % 4
+            padding = PictureReader.__find_padding(pixel_depth, row_width)
 
             calculate_pixels: list[list[PixelXXBit]] = []
             tmp_calculate_pixel: PixelXXBit = PixelXXBit(0,0,0)
@@ -97,5 +95,12 @@ class PictureReader:
                     tmp_row = []
                     i += padding
         if not calculate_pixels:
-            raise TypeError(f'there is no such header type {type(header)}')
+            raise TypeError(f'unexpected header type {type(header)}')
         return calculate_pixels
+
+    @staticmethod
+    def __find_padding(pixel_depth: int, row_width: int) -> int:
+        bytes_per_pixel = pixel_depth // 8
+        row_size = row_width * bytes_per_pixel
+        padding = (4 - row_size % 4) % 4
+        return padding

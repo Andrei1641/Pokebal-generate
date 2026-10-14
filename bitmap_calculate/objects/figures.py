@@ -48,9 +48,12 @@ class Line(Figure):
     def __init__(self, point1: Point, point2: Point):
         self.__m: None|float = (point2.y - point1.y) / (point2.x - point1.x) if point2.x - point1.x != 0 else None
         self.__b: float = point1.y - self.__m * point1.x if self.__m else 0
-        self.__x_borders: tuple[float, float] = (point1.x, point2.x) if point1.x < point2.x else (point2.x, point1.x)
-        self.__y_borders: tuple[float, float] = (point1.y, point2.y) if point1.y < point2.y else (point2.y, point1.y)
+        self.__x_borders: tuple[float, float] = Line.__set_borders(point1.x, point2.x)
+        self.__y_borders: tuple[float, float] = Line.__set_borders(point1.y, point2.y)
 
+    @staticmethod
+    def __set_borders(val1: float, val2: float) -> tuple[float, float]:
+        return (val1, val2) if val1 < val2 else (val2, val1)
 
     def get_slope(self, x: float = 0) -> None|float:
         return self.__m
@@ -64,20 +67,28 @@ class Line(Figure):
         return self.__y_borders
 
     def calculate_point_side(self, point: Point) -> int:
-        if self.__m:
-            if point.y < self.__m * point.x + self.__b:
+        if self.__m is not None and self.__m != 0:
+            if point.x < (point.y - self.__b) / self.__m:
+                return -1
+            elif point.x > (point.y - self.__b) / self.__m:
                 return 1
-            elif point.y > self.__m * point.x + self.__b:
-                return -1
             else:
-                return -1
-        else:
+                return 1
+        elif self.__m is None:
             if point.x < self.__x_borders[0]:
                 return -1
             elif point.x > self.__x_borders[0]:
                 return 1
             else:
                 return 1
+        else:
+            if point.y < self.__y_borders[0]:
+                return -1
+            elif point.y > self.__y_borders[0]:
+                return 1
+            else:
+                return 1
+
 
 
 class Point:

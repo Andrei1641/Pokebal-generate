@@ -57,6 +57,10 @@ class PixelXXBit:
         self.__green = color[1]
         self.__blue = color[2]
 
+        PixelXXBit.__set_biggest_number(color[0])
+        PixelXXBit.__set_biggest_number(color[1])
+        PixelXXBit.__set_biggest_number(color[2])
+
     def __mul__(self, other: int):
         calculation_pixels: list[PixelXXBit] = []
         for _ in range(other):
@@ -71,7 +75,7 @@ class PixelAdapter:
 
     def translate_calculate_to_render_pixels(self) -> list[list[Pixel]]:
         render_pixels: list[list[Pixel]] = []
-        pixel_class: type[Pixel] = self.__find_needed_depth()
+        pixel_class: type[Pixel] = self.__find_needed_depth_render_pixel()
         for pixel_row in self.__calculation_pixels:
             tmp_render_pixels_row: list[Pixel] = []
             for pixel in pixel_row:
@@ -80,7 +84,7 @@ class PixelAdapter:
         return render_pixels
 
 
-    def __find_needed_depth(self) -> type[Pixel]:
+    def __find_needed_depth_render_pixel(self) -> type[Pixel]:
         biggest_number = PixelXXBit.get_biggest_number()
         bits_to_represent_number = Translator.get_number_of_bits_to_represent_number(biggest_number)
         for pixel_class in self.__pixel_classes:

@@ -35,8 +35,13 @@ class Frame:
         return normalized_render_pixels
 
     def draw_point(self, point: Point, color: tuple[int,int,int]):
-        selected_pixel: PixelXXBit = self.__pixels[round(point.y)][round(point.x)]
-        selected_pixel.set_color(color)
+        try:
+            if not point.y < 0 or point.x < 0:
+                selected_pixel: PixelXXBit = self.__pixels[round(point.y)][round(point.x)]
+                selected_pixel.set_color(color)
+        except IndexError:
+            pass
+
 
 
     def draw_rectangle(self, position: Point, width: int, height: int, color: tuple[int,int,int]):
@@ -48,7 +53,7 @@ class Frame:
         tmp_point: Point = Point(circle.x_0, circle.y_0 - circle.r)
         circle_edge_points_bellow: list[tuple[Point, Point]] = [(tmp_point, tmp_point)]
         circle_edge_points_upper: list[tuple[Point, Point]] = [(Frame.mirror_point(tmp_point, y=circle.y_0), Frame.mirror_point(tmp_point, y=circle.y_0))]
-        while tmp_point.y <= circle.y_0:
+        while tmp_point.y < circle.y_0:
             tmp_point = Frame.find_next_point(tmp_point, circle)
             mirrored_x = Frame.mirror_point(tmp_point, x=circle.x_0)
             mirrored_y = Frame.mirror_point(tmp_point, y=circle.y_0)
@@ -71,16 +76,18 @@ class Frame:
             return Point(2 * x - point.x, point.y)
         elif y is not None and x is None:
             return Point(point.x, 2 * y - point.y)
+        elif x is not None and y is not None:
+            return Point(2 * x - point.x, 2 * y - point.y)
         else:
-            raise ValueError('select only one line')
+            raise ValueError("select at least one of x and y")
 
     def draw_line(self, line: Line, color: tuple[int,int,int]):
         tmp_point: Point = Point(line.x_borders[0], line.y_borders[0])
-        bigger_borders: tuple[float, float] = line.x_borders if line.x_borders[1] - line.x_borders[0] > line.y_borders[1] - line.y_borders[0] else line.y_borders
-        for i in range(round(bigger_borders[0]), round(bigger_borders[1])):
+        while round(tmp_point.x) != line.x_borders[1] or round(tmp_point.y) != line.y_borders[1]:
             try:
-                tmp_pixel: PixelXXBit = self.__pixels[round(tmp_point.y)][round(tmp_point.x)]
-                tmp_pixel.set_color(color)
+                if not tmp_point.y < 0 or not tmp_point.x < 0:
+                    tmp_pixel: PixelXXBit = self.__pixels[round(tmp_point.y)][round(tmp_point.x)]
+                    tmp_pixel.set_color(color)
             except IndexError:
                 pass
             tmp_point = Frame.find_next_point(tmp_point, line)
@@ -88,7 +95,10 @@ class Frame:
 
     @staticmethod
     def find_next_point(point: Point, figure: Figure) -> Point:
-        """search next pixel from left to right(from bottom to top)"""
+        """
+        search next pixel from left to right(from bottom to top)
+        use first point of the figure
+        """
         point_side = figure.calculate_point_side(point)
         slope = figure.get_slope(point.x)
         if slope is None:

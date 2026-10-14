@@ -135,7 +135,7 @@ class WinBody(Body):
         self.__height = height
 
     def get_body(self) -> list[int]:
-        bytes_per_pixel = self.get_color_deph() // 8
+        bytes_per_pixel = self.get_color_depth() // 8
         row_bytes = self.get_width() * bytes_per_pixel
         padding_per_row = (4 - (row_bytes % 4)) % 4
         padding_per_row_in_byte = [0] * padding_per_row
@@ -151,7 +151,7 @@ class WinBody(Body):
         return pixels_in_bytes
 
 
-    def get_color_deph(self) -> int:
+    def get_color_depth(self) -> int:
         return type(self.__pixels[0]).get_color_depth()
 
 

@@ -7,7 +7,7 @@ class Body(ABC):
         ...
 
     @abstractmethod
-    def get_color_deph(self) -> int:
+    def get_color_depth(self) -> int:
         ...
 
     @abstractmethod

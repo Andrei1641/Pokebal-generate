@@ -3,10 +3,16 @@ import math
 class Translator:
     @staticmethod
     def from_int_to_bytes(number: int) -> list[int]:
+        if number < 0:
+            raise ValueError("please write only positive number")
         number_of_bits: int = Translator.get_number_of_bits_to_represent_number(number)
         number_of_bytes: int = math.ceil(number_of_bits / 8)
         if not number_of_bytes: return [0]
-        return list(number.to_bytes(number_of_bytes))
+        try:
+            b = list(number.to_bytes(number_of_bytes))
+        except OverflowError:
+            b = list(number.to_bytes(number_of_bytes + 1))
+        return b
 
     @staticmethod
     def from_bytes_to_int(b: list[int]) -> int:
@@ -15,6 +21,8 @@ class Translator:
 
     @staticmethod
     def get_number_of_bits_to_represent_number(number: int) -> int:
+        if number < 0:
+            raise ValueError("please write only positive number")
         if not number: return 0
         if number == 1: return 1
         return math.ceil(math.log(number, 2))

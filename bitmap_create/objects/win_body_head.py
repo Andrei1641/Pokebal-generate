@@ -160,7 +160,7 @@ class WinBody(Body):
         row_bytes = self.get_width() * bytes_per_pixel
         padding_per_row = (4 - (row_bytes % 4)) % 4
         padding_per_row_in_byte = [0] * padding_per_row
-        pixels: list[Pixel] = self.pixels
+        pixels: list[Pixel] = self.__pixels
         pixels_in_bytes: list[int] = []
         row_pixel_counter = 0
         for pixel in pixels:
@@ -182,7 +182,3 @@ class WinBody(Body):
 
     def get_width(self) -> int:
         return self.__width
-
-    @property
-    def pixels(self) -> list[Pixel]:
-        return self.__pixels

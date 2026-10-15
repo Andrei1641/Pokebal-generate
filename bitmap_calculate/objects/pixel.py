@@ -99,6 +99,3 @@ class PixelAdapter:
         for render_pixel in render_pixels:
             normalized_pixels += render_pixel
         return normalized_pixels
-
-
-

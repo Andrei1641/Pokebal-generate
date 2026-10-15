@@ -138,6 +138,8 @@ class TestDrawCircle(unittest.TestCase):
         self.frame.draw_circle(Point(5, 5), 5, (255, 0, 0), True)
         self.assertEqual(self.frame._Frame__pixels[5][5].red, 255)
         self.assertEqual(self.frame._Frame__pixels[6][5].red, 0)
+        with self.assertRaises(AssertionError):
+            self.assertEqual(self.frame._Frame__pixels[4][5].red, 0)
 
 class TestGetRenderPixels(unittest.TestCase):
     def test_standard_case(self):

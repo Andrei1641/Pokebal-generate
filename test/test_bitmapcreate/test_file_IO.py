@@ -147,6 +147,11 @@ class TestReadRawBody(unittest.TestCase):
 class TestCreateCalculatePixels(unittest.TestCase):
     def test_unexpected_header(self):
         class SomeHeader(Header):
+            @staticmethod
+            def get_magic_number() -> bytes:
+                pass
+            def set_header(self, b: bytes):
+                pass
             def get_header(self) -> list[int]:
                 pass
             def get_body_position(self) -> int:

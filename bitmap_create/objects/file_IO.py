@@ -2,8 +2,7 @@ from copy import deepcopy
 
 from bitmap_calculate.objects.pixel import PixelXXBit
 from bitmap_create.interface.body_and_head import *
-from bitmap_create.objects.win_body_head import WinHeader, WinBody
-from tools import Translator
+from bitmap_create.objects.win_body_head import WinHeader
 
 
 class PictureCreator:

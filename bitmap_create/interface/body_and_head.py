@@ -19,6 +19,16 @@ class Body(ABC):
         ...
 
 class Header(ABC):
+
+    @staticmethod
+    @abstractmethod
+    def get_magic_number() -> bytes:
+        ...
+
+    @abstractmethod
+    def set_header(self, b:bytes):
+        ...
+
     @abstractmethod
     def get_header(self) -> list[int]:
         ...

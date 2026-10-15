@@ -4,9 +4,9 @@ from tools import CreationProver, Translator
 
 
 class WinHeader(Header):
-    def __init__(self, bfSize: int, bfReserved: int, bfOffbits: int, biSize: int, biWith: int, biHight: int,
-                 biPlanes: int, biBitCount: int, biCompression: int, biSizeImage: int, biXPelsPerMeter: int,
-                 biYPelsPerMeter: int, biClrUsed: int, biClrImportant: int):
+    def __init__(self, bfSize: int = 0, bfReserved: int = 0, bfOffbits: int = 54, biSize: int = 40, biWith: int = 0, biHight: int = 0,
+                 biPlanes: int = 1, biBitCount: int = 0, biCompression: int = 0, biSizeImage: int = 0, biXPelsPerMeter: int = 0,
+                 biYPelsPerMeter: int = 0, biClrUsed: int = 0, biClrImportant: int = 0):
         self.__bfType: int = 19778
         self.__set_bfSize(bfSize)
         self.__set_bfReserved(bfReserved)
@@ -44,11 +44,32 @@ class WinHeader(Header):
         header_byte_list += WinHeader.__translate_attr_in_byte_getter(self.__biClrImportant, 4)
         return header_byte_list
 
+    def set_header(self, b: bytes):
+        b:list[int] = list(b)
+        self.__bfSize = Translator.from_bytes_to_int(Translator.translate_endian(b[2:6]))
+        self.__bfReserved = Translator.from_bytes_to_int(Translator.translate_endian(b[6:10]))
+        self.__bfOffBits = Translator.from_bytes_to_int(Translator.translate_endian(b[10:14]))
+        self.__biSize = Translator.from_bytes_to_int(Translator.translate_endian(b[14:18]))
+        self.__biWidth = Translator.from_bytes_to_int(Translator.translate_endian(b[18:22]))
+        self.__biHight = Translator.from_bytes_to_int(Translator.translate_endian(b[22:26]))
+        self.__biPlanes = Translator.from_bytes_to_int(Translator.translate_endian(b[26:28]))
+        self.__biBitCount = Translator.from_bytes_to_int(Translator.translate_endian(b[28:30]))
+        self.__biCompression = Translator.from_bytes_to_int(Translator.translate_endian(b[30:34]))
+        self.__biSizeImage = Translator.from_bytes_to_int(Translator.translate_endian(b[34:38]))
+        self.__biXPelsPerMeter = Translator.from_bytes_to_int(Translator.translate_endian(b[38:42]))
+        self.__biYPelsPerMeter = Translator.from_bytes_to_int(Translator.translate_endian(b[42:46]))
+        self.__biClrUsed = Translator.from_bytes_to_int(Translator.translate_endian(b[46:50]))
+        self.__biClrImportant = Translator.from_bytes_to_int(Translator.translate_endian(b[50:54]))
+
     @staticmethod
     def __translate_attr_in_byte_getter(attr: int, bytes_border: int) -> list[int]:
         attr_bytes: list[int] = Translator.from_int_to_bytes(attr)
         attr_bytes_filled: list[int] = Translator.fill_bytes_border(attr_bytes, bytes_border)
         return Translator.translate_endian(attr_bytes_filled)
+
+    @staticmethod
+    def get_magic_number() -> bytes:
+        return b'BM'
 
     def get_body_position(self) -> int:
         return self.__bfOffBits

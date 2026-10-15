@@ -14,6 +14,8 @@ class PictureCreator:
             f.write(bytes(body.get_body()))
 
 class PictureReader:
+    __header_types: list[type[Header]] = [WinHeader]                                 #is manually changeable
+
     @staticmethod
     def get_calculate_pixels(address: str) -> list[list[PixelXXBit]]:
         header: Header = PictureReader.__read_header(address)
@@ -22,11 +24,16 @@ class PictureReader:
         return calculate_pixels
 
     @staticmethod
-    def __read_header(address:str) -> Header:            #!!!
+    def __read_header(address:str) -> Header:
         header: Header|None = None
         magic_number: bytes = PictureReader.__read_magic_number(address)
-        if b'BM' in magic_number:
-            header = PictureReader.__read_win_header(address)
+        content: bytes = b''
+        with open(address, "rb") as f:
+            content = f.read()
+        for headerType in PictureReader.__header_types:
+            if headerType.get_magic_number() in magic_number:
+                header = headerType()
+                header.set_header(content)
         if not header:
             raise TypeError(f'unexpected magic number {magic_number}')
         return header
@@ -37,30 +44,6 @@ class PictureReader:
             content = f.read(8)
         return content
 
-
-    @staticmethod
-    def __read_win_header(address: str) -> WinHeader:      #!!!
-        with open(address, "rb") as f:
-            bfType = f.read(2)
-            bfSize = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            bfReserved = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            bfOffBits = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biSize = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biWidth = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biHight = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biPlanes = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(2))))
-            biBitCount = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(2))))
-            biCompression = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biSizeImage = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biXPelsPerMeter = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biYPelsPerMeter = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biClrUsed = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-            biClrImportant = Translator.from_bytes_to_int(Translator.translate_endian(list(f.read(4))))
-
-        win_header: WinHeader = WinHeader(bfSize, bfReserved, bfOffBits, biSize, biWidth, biHight, biPlanes,
-                                          biBitCount, biCompression, biSizeImage, biXPelsPerMeter, biYPelsPerMeter,
-                                          biClrUsed, biClrImportant)
-        return win_header
 
     @staticmethod
     def __read_raw_body(address: str, header: Header) -> bytes:
